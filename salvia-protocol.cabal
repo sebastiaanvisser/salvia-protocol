@@ -37,9 +37,6 @@ Library
                     split ==0.1.*
 
   Other-modules:    Misc.Text
-                    Misc.Util
-                    Misc.Terminal
-
   Exposed-modules:  Network.Protocol.Cookie
                     Network.Protocol.Http
                     Network.Protocol.Http.Data
