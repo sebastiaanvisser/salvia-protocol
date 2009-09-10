@@ -1,7 +1,7 @@
 Name:               salvia-protocol
 Version:            0.1.0
-Description:        Protocol suite for URIs, HTTP, Cookies and MIME.
-Synopsis:           Protocol suite for URIs, HTTP, Cookies and MIME.
+Description:        Protocol suite the Salvia webserver, including functionality for URI, HTTP, Cookie and MIME.
+Synopsis:           Protocol suite the Salvia webserver, including functionality for URI, HTTP, Cookie and MIME.
 Cabal-version:      >= 1.6
 Category:           Network, Web, Protocol
 License:            BSD3

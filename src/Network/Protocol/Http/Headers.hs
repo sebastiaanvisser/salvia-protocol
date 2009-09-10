@@ -21,17 +21,17 @@ connection = header "Connection"
 -- | Access the /Accept/ header field.
 
 accept :: Http a :-> Maybe Parameters
-accept = keyValues "," ";" `iso` id % header "Accept"
+accept = lmap (keyValues "," ";") `iso` header "Accept"
 
 -- | Access the /Accept-Encoding/ header field.
 
 acceptEncoding :: Http a :-> Maybe [String]
-acceptEncoding = (values "," `iso` id) % header "Accept-Encoding"
+acceptEncoding = lmap (values ",") `iso` header "Accept-Encoding"
 
 -- | Access the /Accept-Language/ header field.
 
 acceptLanguage :: Http a :-> Maybe [String]
-acceptLanguage = values "," `iso` id % header "Accept-Language"
+acceptLanguage = lmap (values ",") `iso` header "Accept-Language"
 
 -- | Access the /Connection/ header field.
 
@@ -62,13 +62,16 @@ location = header "Location"
 -- into a mimetype and optional charset.
 
 contentType :: Http a :-> Maybe (String, Maybe String)
-contentType = (parser <-> fmap printer) `iso` (keyValues ";" "=" `iso` id % header "Content-Type")
+contentType = 
+        (parser <-> fmap printer)
+  `iso` lmap (keyValues ";" "=")
+  `iso` header "Content-Type"
   where 
+    printer (x, y) = (x, Nothing) : maybe [] (\z -> [("charset", Just z)]) y
     parser a = 
       case a of
         Just ((m, Nothing):("charset", c):_) -> Just (m, c)
         _                                    -> Nothing
-    printer (x, y) = (x, Nothing) : maybe [] (\z -> [("charset", Just z)]) y
 
 -- | Access the /Data/ header field.
 

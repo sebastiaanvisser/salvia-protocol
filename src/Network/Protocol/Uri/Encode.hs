@@ -28,6 +28,6 @@ decode (d:ds) = d : decode ds
 
 -- | Decoding and encoding as a label.
 
-encoded :: Lens String String
+encoded :: String :<->: String
 encoded = decode <-> encode
 

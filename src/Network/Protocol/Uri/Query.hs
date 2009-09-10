@@ -19,14 +19,14 @@ queryParams = params `iso` _query
 
 -- | Generic label to parse a string as query parameters.
 
-params :: Lens String Parameters
+params :: String :<->: Parameters
 params = keyValues "&" "=" . (from <-> to) . encoded
   where from = intercalate " " . splitOn "+"
         to   = intercalate "+" . splitOn " "
 
 -- | Generic label for accessing key value pairs encoded in a string.
 
-keyValues :: String -> String -> Lens String Parameters
+keyValues :: String -> String -> String :<->: Parameters
 keyValues sep eqs = parser <-> printer
   where parser =
             filter (\(a, b) -> not (null a) || b /= Nothing && b /= Just "")
@@ -41,7 +41,7 @@ keyValues sep eqs = parser <-> printer
 
 -- | Generic label for accessing lists of values encoded in a string.
 
-values :: String -> Lens String [String]
+values :: String -> String :<->: [String]
 values sep = parser <-> printer
   where parser = filter (not . null) . concat . map (splitOn sep) . lines
         printer = intercalate sep

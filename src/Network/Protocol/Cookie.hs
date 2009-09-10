@@ -157,7 +157,7 @@ showsCookie c =
 
 parseCookie :: String -> Cookie
 parseCookie s = 
-  let p = forth (keyValues ";" "=") s
+  let p = fw (keyValues ";" "=") s
   in Cookie
     { _name       = (fromMaybe "" .        fmap fst . headMay)              p
     , _value      = (fromMaybe "" . join . fmap snd . headMay)              p
@@ -175,7 +175,7 @@ parseCookie s =
 
 -- | Cookie parser and pretty printer as a lens.
 
-cookie :: Lens Cookie String
+cookie :: Cookie :<->: String
 cookie = show <-> parseCookie
 
 -- | A collection of multiple cookies. These can all be set in one single HTTP
@@ -193,7 +193,7 @@ instance Show Cookies where
 
 -- | Cookies parser and pretty printer as a lens.
 
-cookies :: Lens String Cookies
+cookies :: String :<->: Cookies
 cookies = (fromList . map parseCookie <-> map show . toList) . values ","
 
 -- | Case-insensitive way of getting a cookie out of a collection by name.
