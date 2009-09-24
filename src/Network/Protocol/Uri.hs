@@ -40,6 +40,7 @@ module Network.Protocol.Uri (
 
   -- * More advanced labels.
 
+  , pathAndQuery
   , queryParams
   , params
   , extension

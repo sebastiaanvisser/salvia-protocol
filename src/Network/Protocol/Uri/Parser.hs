@@ -10,6 +10,7 @@ import Data.Record.Label
 import Network.Protocol.Uri.Data
 import Network.Protocol.Uri.Data
 import Network.Protocol.Uri.Encode
+import Network.Protocol.Uri.Query
 import Network.Protocol.Uri.Printer ()
 import Prelude hiding ((.), id)
 import Safe
@@ -26,6 +27,13 @@ host = (show <-> either (const mkHost) id . parseHost) `iso` (_host . authority)
 
 path :: Uri :-> FilePath
 path = (decode . show <-> either (const mkPath) id . parsePath . encode) `iso` _path
+
+-- | Access the path and query parts of the URI as a single string. The string
+-- will will be properly decoded when reading and encoded when writing.
+
+pathAndQuery :: Uri :-> String
+pathAndQuery = values "?" `osi` Label ((\p q -> [p, q]) <$> idx 0 `for` path <*> idx 1 `for` query)
+  where idx = flip (atDef "")
 
 -- | Parse string into a URI and ignore all failures by returning an empty URI
 -- when parsing fails. Can be quite useful in situations that parse errors are

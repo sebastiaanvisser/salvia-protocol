@@ -9,7 +9,7 @@ instance Show Path where
   showsPrec _ (Path xs)      = intersperseS (sc '/') (map ss xs)
 
 instance Show IPv4 where
-  showsPrec _ (IPv4 a b c d) = intersperseS (sc ',') (map shows [a, b, c, d])
+  showsPrec _ (IPv4 a b c d) = intersperseS (sc '.') (map shows [a, b, c, d])
 
 instance Show Domain where
   showsPrec _ (Domain d) = intersperseS (sc '.') (map ss d)
