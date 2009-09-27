@@ -38,6 +38,7 @@ Library
                     Network.Protocol.Uri.Parser
                     Network.Protocol.Uri.Path
                     Network.Protocol.Uri.Printer
+                    Network.Protocol.Uri.Remap
                     Network.Protocol.Uri.Query
 
   Extensions:       FlexibleContexts
