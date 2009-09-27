@@ -19,7 +19,7 @@ type PathSegment = String
 data IPv4 = IPv4 Int Int Int Int
   deriving (Eq, Ord)
 
-newtype Domain = Domain { __parts :: [String] }
+data Domain = Domain { __parts :: [String] }
   deriving (Eq, Ord)
 
 data Host =
@@ -51,6 +51,7 @@ data Uri = Uri
 
 $(mkLabels [''Domain, ''Path, ''Host, ''Authority, ''Uri])
 
+_parts    :: Domain :-> [String]
 _domain   :: Host :-> Domain
 _ipv4     :: Host :-> IPv4
 _regname  :: Host :-> String

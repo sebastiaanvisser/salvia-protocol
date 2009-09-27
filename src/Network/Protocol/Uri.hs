@@ -38,12 +38,14 @@ module Network.Protocol.Uri (
   , query
   , fragment
 
-  -- * More advanced labels.
+  -- * More advanced labels and functions.
 
   , pathAndQuery
   , queryParams
   , params
   , extension
+
+  , remap
 
   -- * Encoding/decoding URI encoded strings.
 
@@ -87,4 +89,5 @@ import Network.Protocol.Uri.Parser
 import Network.Protocol.Uri.Path
 import Network.Protocol.Uri.Printer ()
 import Network.Protocol.Uri.Query
+import Network.Protocol.Uri.Remap
 

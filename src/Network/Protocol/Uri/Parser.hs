@@ -4,15 +4,14 @@ module Network.Protocol.Uri.Parser where
 import Control.Applicative hiding (empty)
 import Control.Category
 import Data.Char
-import Data.List (intercalate)
+import Data.List 
 import Data.Maybe
 import Data.Record.Label
 import Network.Protocol.Uri.Data
-import Network.Protocol.Uri.Data
 import Network.Protocol.Uri.Encode
-import Network.Protocol.Uri.Query
 import Network.Protocol.Uri.Printer ()
-import Prelude hiding ((.), id)
+import Network.Protocol.Uri.Query
+import Prelude hiding ((.), id, mod)
 import Safe
 import Text.Parsec hiding (many, (<|>))
 import Text.Parsec.Prim (Stream, ParsecT)
