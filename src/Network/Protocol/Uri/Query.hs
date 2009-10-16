@@ -2,7 +2,6 @@ module Network.Protocol.Uri.Query where
 
 import Prelude hiding ((.), id)
 import Control.Category
-import Data.Char
 import Data.List
 import Data.List.Split 
 import Data.Record.Label

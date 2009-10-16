@@ -23,10 +23,9 @@ module Network.Protocol.Cookie {- todo: test please -}
   , version
 
   -- * Collection of cookies.
-
   , Cookies (..)
   , cookies
-  , getCookie
+  , oneCookie
 
   , fromList
   , toList
@@ -198,8 +197,9 @@ cookies = (fromList . map parseCookie <-> map show . toList) . values ","
 
 -- | Case-insensitive way of getting a cookie out of a collection by name.
 
-getCookie :: String -> Cookies -> Maybe Cookie
-getCookie n = M.lookup (map toLower n) . unCookies
+oneCookie :: String -> Cookies :-> Maybe Cookie
+oneCookie n = lookupL (map toLower n) . ((unCookies <-> Cookies) `iso` id)
+  where lookupL k = label (M.lookup k) (flip M.alter k . const)
 
 -- | Convert a list to a cookies collection.
 

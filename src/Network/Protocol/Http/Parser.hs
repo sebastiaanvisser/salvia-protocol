@@ -17,14 +17,12 @@ module Network.Protocol.Http.Parser {- doc ok -}
   ) where
 
 import Control.Applicative hiding (empty)
-import Control.Monad
 import Data.Char
 import Data.List hiding (insert)
 import Data.Map (insert, empty)
 import Network.Protocol.Http.Data
 import Network.Protocol.Http.Status
 import Text.Parsec hiding (many, (<|>))
-import Text.Parsec.Prim (Stream, ParsecT)
 
 -- | Parse a string as an HTTP request message. This parser is very forgiving.
 

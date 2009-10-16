@@ -14,7 +14,6 @@ import Network.Protocol.Uri.Query
 import Prelude hiding ((.), id, mod)
 import Safe
 import Text.Parsec hiding (many, (<|>))
-import Text.Parsec.Prim (Stream, ParsecT)
 
 -- | Access the host part of the URI.
 

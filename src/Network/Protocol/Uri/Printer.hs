@@ -1,6 +1,5 @@
 module Network.Protocol.Uri.Printer where
 
-import Data.List
 import Network.Protocol.Uri.Data
 import Misc.Text
 
