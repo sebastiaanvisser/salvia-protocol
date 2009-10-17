@@ -14,13 +14,13 @@ Library
   GHC-Options:      -Wall -fno-warn-orphans
   HS-Source-Dirs:   src
 
-  Build-Depends:    base <= 5,
-                    containers ==0.2.*,
-                    safe ==0.2.*,
-                    fclabels ==0.4.*,
-                    split ==0.1.*,
-                    bimap ==0.2.*,
-                    parsec ==3.0.*
+  Build-Depends:    base,
+                    containers,
+                    safe,
+                    fclabels,
+                    split,
+                    bimap,
+                    parsec
 
   Other-modules:    Misc.Text
   Exposed-modules:  Network.Protocol.Cookie
