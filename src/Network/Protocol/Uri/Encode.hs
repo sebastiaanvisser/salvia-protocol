@@ -5,7 +5,8 @@ import Data.Char
 import Data.Maybe
 import Data.Record.Label
 import Network.Protocol.Uri.Chars
-import Prelude hiding ((.), id)
+import qualified Data.ByteString as B
+import qualified Data.ByteString.UTF8 as U
 
 -- | URI encode a string.
 
@@ -21,10 +22,12 @@ encode = concatMap encodeChr
 -- | URI decode a string.
 
 decode :: String -> String
-decode [] = []
-decode ('%':d:e:ds) | isHexDigit d && isHexDigit e = (chr $ digs d * 16 + digs e) : decode ds 
-  where digs a = fromJust $ lookup (toLower a) $ zip "0123456789abcdef" [0..]
-decode (d:ds) = d : decode ds
+decode = U.toString . B.pack . map (fromIntegral . ord) . dec
+  where
+    dec [] = []
+    dec ('%':d:e:ds) | isHexDigit d && isHexDigit e = (chr $ digs d * 16 + digs e) : dec ds 
+      where digs a = fromJust $ lookup (toLower a) $ zip "0123456789abcdef" [0..]
+    dec (d:ds) = d : dec ds
 
 -- | Decoding and encoding as a label.
 

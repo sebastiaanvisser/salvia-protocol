@@ -1,7 +1,6 @@
 module Network.Protocol.Uri.Printer where
 
 import Network.Protocol.Uri.Data
-import Misc.Text
 
 instance Show Path where
   showsPrec _ (Path ("":xs)) = sc '/' . shows (Path xs)
@@ -39,4 +38,10 @@ ss = showString
 
 sc :: Char -> ShowS
 sc = showChar
+
+-- | ShowS version of intersperse.
+
+intersperseS :: ShowS -> [ShowS] -> ShowS
+intersperseS _ []     = id
+intersperseS s (x:xs) = foldl (\a b -> a.s.b) x xs
 

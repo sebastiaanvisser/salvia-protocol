@@ -2,11 +2,11 @@
 module Network.Protocol.Http.Data where {- doc ok -}
 
 import Control.Category
+import Data.Char
 import Data.List hiding (lookup)
 import Data.List.Split
 import Data.Map hiding (map)
 import Data.Record.Label
-import Misc.Text
 import Network.Protocol.Http.Status
 import Network.Protocol.Uri
 import Prelude hiding ((.), id, lookup, mod)
@@ -138,7 +138,10 @@ status = _status . headline
 -- | Normalize the capitalization of an HTTP header key.
 
 normalizeHeader :: Key -> Key
-normalizeHeader = intercalate "-" . map normalCase . splitOn "-"
+normalizeHeader = intercalate "-" . map casing . splitOn "-"
+  where
+  casing ""     = ""
+  casing (x:xs) = toUpper x : map toLower xs
 
 -- | Generic label to access an HTTP header field by key.
 

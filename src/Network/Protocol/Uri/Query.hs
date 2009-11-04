@@ -5,7 +5,6 @@ import Control.Category
 import Data.List
 import Data.List.Split 
 import Data.Record.Label
-import Misc.Text
 import Network.Protocol.Uri.Data
 import Network.Protocol.Uri.Encode
 
@@ -42,6 +41,12 @@ keyValues sep eqs = parser <-> printer
 
 values :: String -> String :<->: [String]
 values sep = parser <-> printer
-  where parser = filter (not . null) . concat . map (splitOn sep) . lines
+  where parser = filter (not . null) . concat . map (map trim . splitOn sep) . lines
         printer = intercalate sep
+
+-- Helper to trim all heading and trailing whitespace.
+
+trim :: String -> String
+trim = rev (dropWhile (`elem` " \t\n\r"))
+  where rev f = reverse . f . reverse . f
 

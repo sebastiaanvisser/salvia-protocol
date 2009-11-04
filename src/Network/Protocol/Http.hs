@@ -1,4 +1,4 @@
-module Network.Protocol.Http {- doc ok -}
+module Network.Protocol.Http
   (
 
   -- * HTTP message data types.

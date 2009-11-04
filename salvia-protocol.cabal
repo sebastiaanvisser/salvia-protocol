@@ -20,9 +20,10 @@ Library
                     fclabels,
                     split,
                     bimap,
-                    parsec
+                    bytestring,
+                    parsec,
+                    utf8-string
 
-  Other-modules:    Misc.Text
   Exposed-modules:  Network.Protocol.Cookie
                     Network.Protocol.Http
                     Network.Protocol.Http.Data

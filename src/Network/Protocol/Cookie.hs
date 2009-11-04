@@ -1,36 +1,37 @@
 {-# LANGUAGE TemplateHaskell #-}
 -- | For more information: http://www.ietf.org/rfc/rfc2109.txt
 module Network.Protocol.Cookie {- todo: test please -}
-  (
-  
-  -- * Cookie datatype.
-    Cookie (Cookie)
-  , cookie
-  , empty
+(
 
-  -- * Accessing cookies.
-  , name
-  , value
-  , comment
-  , commentURL
-  , discard
-  , domain
-  , maxAge
-  , expires
-  , path
-  , port
-  , secure
-  , version
+-- * Cookie datatype.
+  Cookie (Cookie)
+, empty
+, cookie
+, cookies
 
-  -- * Collection of cookies.
-  , Cookies (..)
-  , cookies
-  , oneCookie
+-- * Accessing cookies.
+, name
+, value
+, comment
+, commentURL
+, discard
+, domain
+, maxAge
+, expires
+, path
+, port
+, secure
+, version
 
-  , fromList
-  , toList
-
-  )
+-- * Collection of cookies.
+, Cookies
+, unCookies
+, setCookie
+, setCookies
+, pickCookie
+, fromList
+, toList
+)
 where
 
 import Prelude hiding ((.), id)
@@ -41,7 +42,6 @@ import Data.Maybe
 import Data.Char
 import Safe
 import Data.List
-import Misc.Text
 import Network.Protocol.Uri.Query
 import qualified Data.Map as M
 
@@ -122,13 +122,13 @@ empty = Cookie "" "" Nothing Nothing False Nothing Nothing Nothing Nothing [] Fa
 -- Cookie show instance.
 
 instance Show Cookie where
-  showsPrec _ = showsCookie
+  showsPrec _ = showsSetCookie
 
 -- Show a semicolon separated list of attribute/value pairs. Only meta pairs
 -- with significant values will be pretty printed.
 
-showsCookie :: Cookie -> ShowS
-showsCookie c =
+showsSetCookie :: Cookie -> ShowS
+showsSetCookie c =
     pair (get name c) (get value c)
   . opt  "comment"    (get comment c)
   . opt  "commentURL" (get commentURL c)
@@ -154,8 +154,11 @@ showsCookie c =
     optval 0     = Nothing
     optval i     = Just (show i)
 
-parseCookie :: String -> Cookie
-parseCookie s = 
+showCookie :: Cookie -> String
+showCookie c = _name c ++ "=" ++ _value c
+
+parseSetCookie :: String -> Cookie
+parseSetCookie s = 
   let p = fw (keyValues ";" "=") s
   in Cookie
     { _name       = (fromMaybe "" .        fmap fst . headMay)              p
@@ -172,42 +175,66 @@ parseCookie s =
     , _version    = (maybe 1 (readDef 1) .      join . lookup "version")    p
     }
 
+parseCookie :: String -> Cookie
+parseCookie s =
+  let p = fw (values "=") s
+  in empty
+       { _name  = atDef "" p 0
+       , _value = atDef "" p 1
+       }
+
 -- | Cookie parser and pretty printer as a lens.
 
+setCookie :: Cookie :<->: String
+setCookie = show <-> parseSetCookie
+
 cookie :: Cookie :<->: String
-cookie = show <-> parseCookie
+cookie = showCookie <-> parseCookie
 
 -- | A collection of multiple cookies. These can all be set in one single HTTP
 -- /Set-Cookie/ header field.
 
-newtype Cookies = Cookies { unCookies :: M.Map String Cookie }
+data Cookies = Cookies { _unCookies :: M.Map String Cookie }
   deriving Eq
 
+$(mkLabels [''Cookies])
+
+unCookies :: Cookies :-> M.Map String Cookie
+
 instance Show Cookies where
-  showsPrec _ =
-      intersperseS (showString ", ")
+  showsPrec _ = showsSetCookies
+
+showsSetCookies :: Cookies -> ShowS
+showsSetCookies =
+      is (showString ", ")
     . map (shows . snd)
     . M.toList
-    . unCookies
+    . get unCookies
+  where
+  is _ []     = id
+  is s (x:xs) = foldl (\a b -> a.s.b) x xs
 
 -- | Cookies parser and pretty printer as a lens.
 
+setCookies :: String :<->: Cookies
+setCookies = (fromList <-> toList) . (map parseSetCookie <-> map show) . values ","
+
 cookies :: String :<->: Cookies
-cookies = (fromList . map parseCookie <-> map show . toList) . values ","
+cookies = (fromList <-> toList) . (map parseCookie <-> map showCookie) . values ";"
 
 -- | Case-insensitive way of getting a cookie out of a collection by name.
 
-oneCookie :: String -> Cookies :-> Maybe Cookie
-oneCookie n = lookupL (map toLower n) . ((unCookies <-> Cookies) `iso` id)
+pickCookie :: String -> Cookies :-> Maybe Cookie
+pickCookie n = lookupL (map toLower n) . unCookies
   where lookupL k = label (M.lookup k) (flip M.alter k . const)
 
 -- | Convert a list to a cookies collection.
 
 fromList :: [Cookie] -> Cookies
-fromList = Cookies . M.fromList . map (\a -> (get name a, a))
+fromList = Cookies . M.fromList . map (\a -> (map toLower $ get name a, a))
 
 -- | Get the cookies as a list.
 
 toList :: Cookies -> [Cookie]
-toList = map snd . M.toList . unCookies
+toList = map snd . M.toList . get unCookies
 
