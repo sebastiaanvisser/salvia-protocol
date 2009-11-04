@@ -15,7 +15,7 @@ type Parameters = [(String, Maybe String)]
 queryParams :: Uri :-> Parameters
 queryParams = params `iso` _query
 
--- | Generic label to parse a string as query parameters.
+-- | Generic lens to parse/print a string as query parameters.
 
 params :: String :<->: Parameters
 params = keyValues "&" "=" . (from <-> to) . encoded

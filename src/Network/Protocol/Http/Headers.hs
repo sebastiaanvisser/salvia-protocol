@@ -68,12 +68,10 @@ contentType =
   `iso` header "Content-Type"
   where 
     printer (x, y) = (x, Nothing) : maybe [] (\z -> [("charset", Just z)]) y
-    parser a = 
-      case a of
-        Just ((m, Nothing):("charset", c):_) -> Just (m, c)
-        _                                    -> Nothing
+    parser (Just ((m, Nothing):("charset", c):_)) = Just (m, c)
+    parser _                                      = Nothing
 
--- | Access the /Data/ header field.
+-- | Access the /Date/ header field.
 
 date :: Http a :-> Maybe String
 date = header "Date"
