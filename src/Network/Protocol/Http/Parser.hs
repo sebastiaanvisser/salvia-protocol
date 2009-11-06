@@ -27,18 +27,18 @@ import Text.Parsec hiding (many, (<|>))
 
 -- | Parse a string as an HTTP request message. This parser is very forgiving.
 
-parseRequest :: String -> Either ParseError (Http Request)
-parseRequest = parse pRequest ""
+parseRequest :: String -> Either String (Http Request)
+parseRequest = either (Left . show) (Right . id) . parse pRequest ""
 
 -- | Parse a string as an HTTP request message. This parser is very forgiving.
 
-parseResponse :: String -> Either ParseError (Http Response)
-parseResponse = parse pResponse ""
+parseResponse :: String -> Either String (Http Response)
+parseResponse = either (Left . show) (Right . id) . parse pResponse ""
 
 -- | Parse a string as a list of HTTP headers.
 
-parseHeaders :: String -> Either ParseError Headers
-parseHeaders = parse pHeaders ""
+parseHeaders :: String -> Either String Headers
+parseHeaders = either (Left . show) (Right . id) . parse pHeaders ""
 
 -- | Parsec parser to parse the header part of an HTTP request.
 
