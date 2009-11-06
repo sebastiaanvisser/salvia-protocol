@@ -5,6 +5,7 @@ module Network.Protocol.Http.Parser {- doc ok -}
 
     parseRequest
   , parseResponse
+  , parseHeaders
 
   -- * Exposure of internal parsec parsers.
 
@@ -33,6 +34,11 @@ parseRequest = parse pRequest ""
 
 parseResponse :: String -> Either ParseError (Http Response)
 parseResponse = parse pResponse ""
+
+-- | Parse a string as a list of HTTP headers.
+
+parseHeaders :: String -> Either ParseError Headers
+parseHeaders = parse pHeaders ""
 
 -- | Parsec parser to parse the header part of an HTTP request.
 

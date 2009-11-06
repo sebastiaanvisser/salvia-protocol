@@ -57,6 +57,7 @@ module Network.Protocol.Http
 
   , parseRequest
   , parseResponse
+  , parseHeaders
 
   -- * Exposure of internal parsec parsers.
   , pRequest
