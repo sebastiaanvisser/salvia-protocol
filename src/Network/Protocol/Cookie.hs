@@ -1,4 +1,4 @@
-{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE TemplateHaskell, TypeOperators #-}
 -- | For more information: http://www.ietf.org/rfc/rfc2109.txt
 module Network.Protocol.Cookie {- todo: test please -}
 (

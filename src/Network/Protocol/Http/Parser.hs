@@ -1,3 +1,4 @@
+{-# LANGUAGE TypeOperators, FlexibleContexts #-}
 module Network.Protocol.Http.Parser {- doc ok -}
   (
 

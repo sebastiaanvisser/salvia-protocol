@@ -1,3 +1,4 @@
+{-# LANGUAGE TypeOperators #-}
 module Network.Protocol.Http.Headers where {- doc ok -}
 
 import Control.Category

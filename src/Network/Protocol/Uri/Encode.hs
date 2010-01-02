@@ -1,3 +1,4 @@
+{-# LANGUAGE TypeOperators #-}
 module Network.Protocol.Uri.Encode where
 
 import Data.Bits

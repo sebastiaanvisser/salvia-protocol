@@ -1,4 +1,4 @@
-{-# LANGUAGE StandaloneDeriving #-}
+{-# LANGUAGE StandaloneDeriving, TypeOperators, FlexibleContexts #-}
 module Network.Protocol.Uri.Parser where
 
 import Control.Applicative hiding (empty)

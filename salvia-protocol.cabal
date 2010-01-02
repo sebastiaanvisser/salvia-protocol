@@ -42,11 +42,3 @@ Library
                     Network.Protocol.Uri.Remap
                     Network.Protocol.Uri.Query
 
-  Extensions:       FlexibleContexts
-                    FlexibleInstances 
-                    RankNTypes
-                    ScopedTypeVariables
-                    TypeOperators
-                    MultiParamTypeClasses
-                    GeneralizedNewtypeDeriving
-

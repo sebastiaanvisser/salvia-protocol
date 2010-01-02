@@ -1,4 +1,4 @@
-{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE TemplateHaskell, TypeOperators #-}
 module Network.Protocol.Uri.Data where
 
 import Prelude hiding ((.), id)

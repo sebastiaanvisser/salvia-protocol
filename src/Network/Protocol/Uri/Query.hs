@@ -1,3 +1,4 @@
+{-# LANGUAGE TypeOperators #-}
 module Network.Protocol.Uri.Query where
 
 import Prelude hiding ((.), id)
