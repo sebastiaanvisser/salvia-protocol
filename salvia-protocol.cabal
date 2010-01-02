@@ -14,7 +14,7 @@ Library
   GHC-Options:      -Wall -fno-warn-orphans
   HS-Source-Dirs:   src
 
-  Build-Depends:    base,
+  Build-Depends:    base ==4.2.*,
                     containers,
                     safe,
                     fclabels,
