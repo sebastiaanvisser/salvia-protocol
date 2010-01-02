@@ -15,14 +15,14 @@ Library
   HS-Source-Dirs:   src
 
   Build-Depends:    base ==4.2.*,
-                    containers,
-                    safe,
-                    fclabels,
-                    split,
-                    bimap,
-                    bytestring,
+                    containers ==0.3.*,
+                    safe ==0.2.*,
+                    fclabels ==0.4.*,
+                    split ==0.1.*,
+                    bimap ==0.2.*,
+                    bytestring ==0.9.*,
                     parsec ==3.0.*,
-                    utf8-string
+                    utf8-string ==0.3.*
 
   Exposed-modules:  Network.Protocol.Cookie
                     Network.Protocol.Http
