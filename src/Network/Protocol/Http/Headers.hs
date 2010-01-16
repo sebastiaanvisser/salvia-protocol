@@ -92,3 +92,8 @@ server = header "Server"
 userAgent :: Http a :-> Maybe String
 userAgent = header "User-Agent"
 
+-- | Access the /Upgrade/ header field.
+
+upgrade :: Http a :-> Maybe String
+upgrade = header "Upgrade"
+

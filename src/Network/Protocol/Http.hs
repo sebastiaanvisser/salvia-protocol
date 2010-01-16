@@ -52,6 +52,7 @@ module Network.Protocol.Http
   , hostname
   , server
   , userAgent
+  , upgrade
 
   -- * Parsing HTTP messages.
 
