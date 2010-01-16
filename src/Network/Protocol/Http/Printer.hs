@@ -19,8 +19,8 @@ instance Show (Http Response) where
 
 instance Show Headers where
   showsPrec _ =
-      fold (\a b -> a . eol . b) id
-    . mapWithKey (\k a -> ss k . ss ": " . ss a)
+      foldr (\a b -> a . eol . b) id
+    . map (\(k, a) -> ss k . ss ": " . ss a)
     . unHeaders
 
 instance Show Version where

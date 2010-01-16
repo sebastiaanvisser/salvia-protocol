@@ -3,9 +3,8 @@ module Network.Protocol.Http.Data where {- doc ok -}
 
 import Control.Category
 import Data.Char
-import Data.List hiding (lookup)
+import Data.List
 import Data.List.Split
-import Data.Map hiding (map)
 import Data.Record.Label
 import Network.Protocol.Http.Status
 import Network.Protocol.Uri
@@ -35,7 +34,7 @@ type Value = String
 
 -- | HTTP headers as mapping from keys to values.
 
-newtype Headers = Headers { unHeaders :: Map Key Value }
+newtype Headers = Headers { unHeaders :: [(Key, Value)] } -- order seems to matter
   deriving Eq
 
 -- | Request specific part of HTTP messages.
@@ -74,7 +73,7 @@ http11 = Version 1 1
 -- | Create an empty set of headers.
 
 emptyHeaders :: Headers
-emptyHeaders = Headers empty
+emptyHeaders = Headers []
 
 -- | Create an empty HTTP request message.
 
@@ -148,5 +147,10 @@ normalizeHeader = intercalate "-" . map casing . splitOn "-"
 header :: Key -> Http a :-> Maybe Value
 header key = label
   (lookup (normalizeHeader key) . unHeaders . get headers)
-  (\x -> mod headers (Headers . alter (const x) (normalizeHeader key) . unHeaders))
+  (\x -> mod headers (Headers . alter (normalizeHeader key) x . unHeaders))
+  where
+  alter :: Eq a => a -> Maybe b -> [(a, b)] -> [(a, b)]
+  alter k v []                      = maybe [] (\w -> (k, w):[]) v
+  alter k v ((x, y):xs) | k == x    = maybe xs (\w -> (k, w):xs) v
+                        | otherwise = (x, y) : alter k v xs
 

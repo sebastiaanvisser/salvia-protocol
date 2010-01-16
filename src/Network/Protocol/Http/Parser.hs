@@ -21,7 +21,6 @@ module Network.Protocol.Http.Parser {- doc ok -}
 import Control.Applicative hiding (empty)
 import Data.Char
 import Data.List hiding (insert)
-import Data.Map (insert, empty)
 import Network.Protocol.Http.Data
 import Network.Protocol.Http.Status
 import Text.Parsec hiding (many, (<|>))
@@ -65,10 +64,10 @@ pResponse =
 pHeaders :: Stream s m Char => ParsecT s u m Headers
 pHeaders = Headers <$> p
   where
-    p = insert
+    p = (\k v -> ((k, v):))
         <$> many1 (noneOf (':':ws)) <* string ":"
         <*> (intercalate ws <$> (many $ many1 (oneOf ls) *> many1 (noneOf lf) <* eol))
-        <*> option empty p
+        <*> option [] p
 
 -- | Parsec parser to parse HTTP versions. Recognizes X.X versions only.
 
