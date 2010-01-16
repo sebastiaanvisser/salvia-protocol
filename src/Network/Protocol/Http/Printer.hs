@@ -1,8 +1,6 @@
 {-# LANGUAGE FlexibleInstances #-}
 module Network.Protocol.Http.Printer () where {- doc ok -}
 
-import Data.Bimap hiding (elems, fold)
-import Data.Map
 import Network.Protocol.Http.Data
 import Network.Protocol.Http.Status
 
@@ -15,7 +13,7 @@ instance Show (Http Request) where
 instance Show (Http Response) where
   showsPrec _ (Http (Response s) v hs) =
       shows v . ss " "
-    . maybe (ss "Unknown status") shows (lookupR s statusCodes)
+    . shows (codeFromStatus s) -- maybe (ss "Unknown status") shows (lookupR s statusCodes)
     . ss " " . shows s . eol
     . shows hs . eol
 

@@ -47,7 +47,7 @@ data Status =
   | ServiceUnavailable           -- ^ 503
   | GatewayTimeOut               -- ^ 504
   | HTTPVersionNotSupported      -- ^ 505
-  | CustomStatus Int
+  | CustomStatus Int String
   deriving (Eq, Ord)
 
 {- | rfc2616 sec6.1.1 Status Code and Reason Phrase. -}
@@ -93,7 +93,7 @@ instance Show Status where
   show ServiceUnavailable           = "Service Unavailable"
   show GatewayTimeOut               = "Gateway Time-out"
   show HTTPVersionNotSupported      = "HTTP Version not supported"
-  show (CustomStatus _)             = "Unknown Status"
+  show (CustomStatus _ s)           = s
 
 {- |
 RFC2616 sec6.1.1 Status Code and Reason Phrase.
@@ -152,11 +152,12 @@ statusFailure st = codeFromStatus st >= 400
 -- | Conversion from status numbers to codes.
 statusFromCode :: Int -> Status
 statusFromCode num =
-    fromMaybe (CustomStatus num)
+    fromMaybe (CustomStatus num "Unknown Status")
   $ lookup num statusCodes
 
 -- | Conversion from status codes to numbers.
 codeFromStatus :: Status -> Int
+codeFromStatus (CustomStatus i _) = i
 codeFromStatus st =
     fromMaybe 0 -- function is total, should not happen.
   $ lookupR st statusCodes
