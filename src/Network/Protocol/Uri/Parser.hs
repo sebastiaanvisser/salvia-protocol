@@ -1,9 +1,16 @@
-{-# LANGUAGE StandaloneDeriving, TypeOperators, FlexibleContexts #-}
+{-# LANGUAGE
+    StandaloneDeriving
+  , TypeOperators
+  , FlexibleContexts
+  , FlexibleInstances
+  #-}
 module Network.Protocol.Uri.Parser where
 
 import Control.Applicative hiding (empty)
 import Control.Category
 import Data.Char
+import Control.Monad
+import Control.Applicative
 import Data.List 
 import Data.Maybe
 import Data.Record.Label
@@ -13,7 +20,15 @@ import Network.Protocol.Uri.Printer ()
 import Network.Protocol.Uri.Query
 import Prelude hiding ((.), id, mod)
 import Safe
-import Text.Parsec hiding (many, (<|>))
+import Text.ParserCombinators.Parsec hiding (many, (<|>))
+
+instance Applicative (GenParser Char st) where
+  pure = return
+  (<*>) = ap
+
+instance Alternative (GenParser Char st) where
+  empty = mzero
+  (<|>) = mplus
 
 -- | Access the host part of the URI.
 
@@ -67,32 +82,31 @@ parseHost = parse pHost ""
 
 -- D.2.  Modifications
 
-pAlpha, pDigit, pAlphanum :: Stream s m Char => ParsecT s u m Char
+pAlpha, pDigit, pAlphanum :: CharParser st Char
 pAlpha    = letter
 pDigit    = digit
 pAlphanum = alphaNum
 
 -- 2.3.  Unreserved Characters
 
-pUnreserved :: Stream s m Char => ParsecT s u m Char
+pUnreserved :: GenParser Char st Char
 pUnreserved  = pAlphanum <|> oneOf "-._~"
 
-{-
-pReserved :: Stream s m Char => ParsecT s u m Char
+pReserved :: GenParser Char st Char
 pReserved  = pGenDelims <|> pSubDelims
-pGenDelims :: Stream s m Char => ParsecT s u m Char
-pGenDelims = oneOf ":/?#[]@"
--}
 
-pSubDelims :: Stream s m Char => ParsecT s u m Char
+pGenDelims :: CharParser st Char
+pGenDelims = oneOf ":/?#[]@"
+
+pSubDelims :: CharParser st Char
 pSubDelims = oneOf "!$&'()*+,;="
 
 -- 2.1.  Percent-Encoding
 
-pPctEncoded :: Stream s m Char => ParsecT s u m String
+pPctEncoded :: GenParser Char st String
 pPctEncoded = (:) <$> char '%' <*> pHex
 
-pHex :: Stream s m Char => ParsecT s u m String
+pHex :: GenParser Char st String
 pHex = (\a b -> a:b:[])
     <$> hexDigit
     <*> hexDigit
@@ -101,24 +115,24 @@ pHex = (\a b -> a:b:[])
 
 -- With the hier-part integrated.
 
-pUri :: Stream s m Char => ParsecT s u m Uri
+pUri :: GenParser Char st Uri
 pUri = (\a (b,c) d e -> Uri False a b c d e)
   <$> (pScheme <* string ":")
-  <*> (ap <|> p)
+  <*> (q <|> p)
   <*> option "" (string "?" *> pQuery)
   <*> option "" (string "#" *> pFragment)
   where
-    ap = (,) <$> (string "//" *> pAuthority) <*> pPathAbempty
-    p  = ((,) mkAuthority) <$> (pPathAbsolute <|> pPathRootless {-<|> pPathEmpty-})
+    q = (,) <$> (string "//" *> pAuthority) <*> pPathAbempty
+    p = ((,) mkAuthority) <$> (pPathAbsolute <|> pPathRootless {-<|> pPathEmpty-})
 
 -- 3.1.  Scheme
 
-pScheme :: Stream s m Char => ParsecT s u m Scheme
+pScheme :: GenParser Char st String
 pScheme = (:) <$> pAlpha <*> many (pAlphanum <|> oneOf "+_.")
 
 -- 3.2.  Authority
 
-pAuthority :: Stream s m Char => ParsecT s u m Authority
+pAuthority :: GenParser Char st Authority
 pAuthority = Authority
   <$> option mkUserinfo (try (pUserinfo <* string "@"))
   <*> pHost
@@ -126,7 +140,7 @@ pAuthority = Authority
 
 -- 3.2.1.  User Information
 
-pUserinfo :: Stream s m Char => ParsecT s u m String
+pUserinfo :: GenParser Char st String
 pUserinfo = concat <$> many (
       (pure <$> pUnreserved)
   <|> (         pPctEncoded)
@@ -136,7 +150,7 @@ pUserinfo = concat <$> many (
 
 -- 3.2.2.  Host
 
-pHost :: Stream s m Char => ParsecT s u m Host
+pHost :: GenParser Char st Host
 pHost = diff <$> pRegName -- <|> RegName <$> pRegName
   where
     diff  a = either (const (RegName a)) sep (parse pHostname "" a)
@@ -169,12 +183,10 @@ pH16           = 1*4HEXDIG
 pLs32          = ( h16 ":" h16 ) <|> IPv4address
 -}
 
-{-
-pIPv4address :: Stream s m Char => ParsecT s u m [Int]
+pIPv4address :: GenParser Char st [Int]
 pIPv4address = (:) <$> pDecOctet <*> (count 3 $ char '.' *> pDecOctet)
--}
 
-pDecOctet :: Stream s m Char => ParsecT s u m Int
+pDecOctet :: GenParser Char st Int
 pDecOctet = read <$> choice [
     try ((\a b c -> [a,b,c]) <$> char '2' <*> char '5'      <*> oneOf "012345")
   , try ((\a b c -> [a,b,c]) <$> char '2' <*> oneOf "01234" <*> digit)
@@ -183,7 +195,7 @@ pDecOctet = read <$> choice [
   ,     (pure                <$>                                digit)
   ]
 
-pRegName :: Stream s m Char => ParsecT s u m String
+pRegName :: GenParser Char st String
 pRegName = concat <$> many1 (
       (pure <$> pUnreserved)
   <|>           pPctEncoded
@@ -192,31 +204,30 @@ pRegName = concat <$> many1 (
 -- Not actually part of the rfc3986, but comptability with the rfc2396.
 -- This information can be useful, so why throw away.
 
-pHostname :: Stream s m Char => ParsecT s u m [String]
+pHostname :: GenParser Char st [String]
 pHostname = sepBy (option "" pDomainlabel) (string ".")
 
-pDomainlabel :: Stream s m Char => ParsecT s u m String
+pDomainlabel :: GenParser Char st String
 pDomainlabel = intercalate "-" <$> sepBy1 (some pAlphanum) (string "-")
 
 -- 3.2.3.  Port
 
-pPort :: Stream s m Char => ParsecT s u m (Maybe Port)
+pPort :: GenParser Char st (Maybe Port)
 pPort = readMay <$> some pDigit
 
 -- 3.4.  Query
 
-pQuery :: Stream s m Char => ParsecT s u m String
+pQuery :: GenParser Char st String
 pQuery = concat <$> many (pPchar <|> pure <$> oneOf "/?")
 
 -- 3.5.  Fragment
 
-pFragment :: Stream s m Char => ParsecT s u m String
+pFragment :: GenParser Char st String
 pFragment = concat <$> many (pPchar <|> pure <$> oneOf "/?" )
 
 -- 3.3.  Path
 
-pPath, pPathAbempty, pPathAbsolute, pPathNoscheme, pPathRootless, pPathEmpty
-  :: Stream s m Char => ParsecT s u m Path
+pPath, pPathAbempty, pPathAbsolute, pPathNoscheme, pPathRootless, pPathEmpty :: GenParser Char st Path
 
 pPath =
       try pPathAbsolute -- begins with "/" but not "//"
@@ -230,7 +241,7 @@ pPathNoscheme = Path <$> ((:) <$> pSegmentNzNc <*> _pSlashSegments)
 pPathRootless = Path <$> ((:) <$> pSegmentNz    <*> _pSlashSegments)
 pPathEmpty    = Path [] <$ string ""
 
-pSegment, pSegmentNz, pSegmentNzNc :: Stream s m Char => ParsecT s u m String
+pSegment, pSegmentNz, pSegmentNzNc :: GenParser Char st String
 pSegment     = concat <$> many pPchar
 pSegmentNz   = concat <$> some pPchar
 pSegmentNzNc = concat <$> some (
@@ -239,12 +250,13 @@ pSegmentNzNc = concat <$> some (
   <|> (pure <$> pSubDelims)
   <|> (pure <$> oneOf "@" ))
 
-_pSlashSegments :: Stream s m Char => ParsecT s u m [PathSegment]
+_pSlashSegments :: GenParser Char st [PathSegment]
 _pSlashSegments = (many $ (:) <$> char '/' *> pSegment)
 
-pPchar :: Stream s m Char => ParsecT s u m String
-pPchar = choice [
-    pure <$> pUnreserved
+
+pPchar :: GenParser Char st String
+pPchar = choice
+  [ pure <$> pUnreserved
   , pPctEncoded
   , pure <$> pSubDelims
   , pure <$> oneOf ":@"
@@ -252,14 +264,14 @@ pPchar = choice [
 
 -- 4.1.  URI Reference
 
-pUriReference :: Stream s m Char => ParsecT s u m Uri
+pUriReference :: GenParser Char st Uri
 pUriReference = try pAbsoluteUri <|> pRelativeRef
 
 -- 4.2.  Relative Reference
 
 -- With the relative-part integrated.
 
-pRelativeRef :: Stream s m Char => ParsecT s u m Uri
+pRelativeRef :: GenParser Char st Uri
 pRelativeRef = ($)
   <$> (try pRelativePart
   <|> ((Uri True mkScheme mkAuthority)
@@ -267,11 +279,10 @@ pRelativeRef = ($)
   <*> option "" (string "?" *> pQuery)
   <*> option "" (string "#" *> pFragment)
 
-pRelativePart :: Stream s m Char => ParsecT s u m (Query -> Fragment -> Uri)
-pRelativePart = (Uri True mkScheme) <$> (string "//" *> pAuthority) <*> pPathAbempty
+pRelativePart :: GenParser Char st (Query -> Fragment -> Uri)
+pRelativePart = Uri True mkScheme <$> (string "//" *> pAuthority) <*> pPathAbempty
 
 -- 4.3.  Absolute URI
 
-pAbsoluteUri :: Stream s m Char => ParsecT s u m Uri
+pAbsoluteUri :: GenParser Char st Uri
 pAbsoluteUri = pUri
-

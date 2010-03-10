@@ -21,7 +21,7 @@ Library
                     split ==0.1.*,
                     bimap ==0.2.*,
                     bytestring ==0.9.*,
-                    parsec ==3.0.*,
+                    parsec ==2.1.*,
                     utf8-string ==0.3.*
 
   Exposed-modules:  Network.Protocol.Cookie

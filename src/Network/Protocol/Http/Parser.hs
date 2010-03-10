@@ -1,29 +1,30 @@
 {-# LANGUAGE TypeOperators, FlexibleContexts #-}
-module Network.Protocol.Http.Parser {- doc ok -}
-  (
-
-  -- * Top level message parsers.
-
-    parseRequest
-  , parseResponse
-  , parseHeaders
-
-  -- * Exposure of internal parsec parsers.
-
-  , pRequest
-  , pResponse
-  , pHeaders
-  , pVersion
-  , pMethod
-
-  ) where
+module Network.Protocol.Http.Parser
+--   (
+-- 
+--   -- * Top level message parsers.
+-- 
+--     parseRequest
+--   , parseResponse
+--   , parseHeaders
+-- 
+--   -- * Exposure of internal parsec parsers.
+-- 
+--   , pRequest
+--   , pResponse
+--   , pHeaders
+--   , pVersion
+--   , pMethod
+-- 
+--   )
+where
 
 import Control.Applicative hiding (empty)
 import Data.Char
 import Data.List hiding (insert)
 import Network.Protocol.Http.Data
 import Network.Protocol.Http.Status
-import Text.Parsec hiding (many, (<|>))
+import Text.ParserCombinators.Parsec hiding (many, (<|>))
 
 -- | Parse a string as an HTTP request message. This parser is very forgiving.
 
@@ -42,7 +43,7 @@ parseHeaders = either (Left . show) (Right . id) . parse pHeaders ""
 
 -- | Parsec parser to parse the header part of an HTTP request.
 
-pRequest :: Stream s m Char => ParsecT s u m (Http Request)
+pRequest :: GenParser Char st (Http Request)
 pRequest =
       (\m u v h -> Http (Request m u) v h)
   <$> (pMethod <* many1 (oneOf ls))
@@ -52,7 +53,7 @@ pRequest =
 
 -- | Parsec parser to parse the header part of an HTTP response.
 
-pResponse :: Stream s m Char => ParsecT s u m (Http Response)
+pResponse :: GenParser Char st (Http Response)
 pResponse =
       (\v s h -> Http (Response (statusFromCode $ read s)) v h)
   <$> (pVersion <* many1 (oneOf ls))
@@ -61,7 +62,7 @@ pResponse =
 
 -- | Parsec parser to parse one or more, possibly multiline, HTTP header lines.
 
-pHeaders :: Stream s m Char => ParsecT s u m Headers
+pHeaders :: GenParser Char st Headers
 pHeaders = Headers <$> p
   where
     p = (\k v -> ((k, v):))
@@ -71,7 +72,7 @@ pHeaders = Headers <$> p
 
 -- | Parsec parser to parse HTTP versions. Recognizes X.X versions only.
 
-pVersion :: Stream s m Char => ParsecT s u m Version
+pVersion :: GenParser Char st Version
 pVersion = 
       (\h l -> Version (ord h - ord '0') (ord l  - ord '0'))
   <$> (istring "HTTP/" *> digit)
@@ -80,7 +81,7 @@ pVersion =
 -- | Parsec parser to parse an HTTP method. Parses arbitrary method but
 -- actually recognizes the ones listed as a constructor for `Method'.
 
-pMethod :: Stream s m Char => ParsecT s u m Method
+pMethod :: GenParser Char st Method
 pMethod =
      choice
    $ map (\a -> a <$ (try . istring . show $ a)) methods
@@ -95,16 +96,16 @@ ls = " \t"
 
 -- Optional parser with maybe result.
 
-pMaybe :: Stream s m t => ParsecT s u m a -> ParsecT s u m (Maybe a)
+pMaybe :: GenParser tok st a -> GenParser tok st (Maybe a)
 pMaybe a = option Nothing (Just <$> a)
 
 -- Parse end of line, \r, \n or \r\n.
 
-eol :: Stream s m Char => ParsecT s u m ()
+eol :: GenParser Char st ()
 eol = () <$ ((char '\r' <* pMaybe (char '\n')) <|> char '\n')
 
 -- Case insensitive string parser.
 
-istring :: Stream s m Char => String -> ParsecT s u m String
+istring :: String -> GenParser Char st String
 istring s = sequence (map (\c -> satisfy (\d -> toUpper c == toUpper d)) s)
 
