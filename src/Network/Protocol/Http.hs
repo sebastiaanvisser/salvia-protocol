@@ -70,7 +70,7 @@ module Network.Protocol.Http
 
   -- * Parser helper methods.
 
-  , protoFromString
+  , versionFromString
   , methodFromString
 
   -- * Printer helper methods.

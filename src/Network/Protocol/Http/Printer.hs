@@ -16,10 +16,14 @@ instance Show (Http Response) where
   showsPrec _ r@(Http Response {} _ hs) =
     showResponseLine r . shows hs . eol
 
+-- | Show HTTP request status line.
+
 showRequestLine :: Http Request -> String -> String
 showRequestLine (Http (Request m u) v _) =
     shows m . ss " " . ss u . ss " "
   . shows v . eol
+
+-- | Show HTTP response status line.
 
 showResponseLine :: Http Response -> String -> String
 showResponseLine (Http (Response s) v _) =

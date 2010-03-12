@@ -18,7 +18,7 @@ module Network.Protocol.Http.Parser
 
 -- * Helper methods.
 
-, protoFromString
+, versionFromString
 , methodFromString
 
 )
@@ -92,10 +92,15 @@ pMethod =
    $ map (\a -> a <$ (try . istring . show $ a)) methods
   ++ [OTHER <$> many (noneOf ws)]
 
-protoFromString :: String -> Version
-protoFromString "HTTP/1.1" = http11
-protoFromString "HTTP/1.0" = http10
-protoFromString _          = http11
+-- | Recognizes HTTP protocol version 1.0 and 1.1, all other string will
+-- produce version 1.1.
+
+versionFromString :: String -> Version
+versionFromString "HTTP/1.1" = http11
+versionFromString "HTTP/1.0" = http10
+versionFromString _          = http11
+
+-- | Helper to turn fully capitalized string into request method.
 
 methodFromString :: String -> Method
 methodFromString "OPTIONS" = OPTIONS
