@@ -8,9 +8,9 @@ module Network.Protocol.Http
   , Key
   , Value
   , Headers (..)
-  , Request
-  , Response
-  , Http
+  , Request (Request)
+  , Response (Response)
+  , Http (Http)
 
   -- * Creating (parts of) messages.
 
@@ -61,11 +61,22 @@ module Network.Protocol.Http
   , parseHeaders
 
   -- * Exposure of internal parsec parsers.
+
   , pRequest
   , pResponse
   , pHeaders
   , pVersion
   , pMethod
+
+  -- * Parser helper methods.
+
+  , protoFromString
+  , methodFromString
+
+  -- * Printer helper methods.
+
+  , showRequestLine
+  , showResponseLine
 
   -- * Handling HTTP status codes.
 
@@ -78,7 +89,7 @@ module Network.Protocol.Http
 
 import Network.Protocol.Http.Data
 import Network.Protocol.Http.Parser
-import Network.Protocol.Http.Printer ()
+import Network.Protocol.Http.Printer
 import Network.Protocol.Http.Headers
 import Network.Protocol.Http.Status
 

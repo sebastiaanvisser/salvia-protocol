@@ -1,5 +1,5 @@
 {-# LANGUAGE TemplateHaskell, TypeOperators #-}
-module Network.Protocol.Http.Data where {- doc ok -}
+module Network.Protocol.Http.Data where
 
 import Control.Category
 import Data.Char
