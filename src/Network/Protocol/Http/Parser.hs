@@ -1,22 +1,27 @@
 {-# LANGUAGE TypeOperators, FlexibleContexts #-}
 module Network.Protocol.Http.Parser
---   (
--- 
---   -- * Top level message parsers.
--- 
---     parseRequest
---   , parseResponse
---   , parseHeaders
--- 
---   -- * Exposure of internal parsec parsers.
--- 
---   , pRequest
---   , pResponse
---   , pHeaders
---   , pVersion
---   , pMethod
--- 
---   )
+(
+
+-- * Top level message parsers.
+
+  parseRequest
+, parseResponse
+, parseHeaders
+
+-- * Exposure of internal parsec parsers.
+
+, pRequest
+, pResponse
+, pHeaders
+, pVersion
+, pMethod
+
+-- * Helper methods.
+
+, protoFromString
+, methodFromString
+
+)
 where
 
 import Control.Applicative hiding (empty)
@@ -86,6 +91,22 @@ pMethod =
      choice
    $ map (\a -> a <$ (try . istring . show $ a)) methods
   ++ [OTHER <$> many (noneOf ws)]
+
+protoFromString :: String -> Version
+protoFromString "HTTP/1.1" = http11
+protoFromString "HTTP/1.0" = http10
+protoFromString _          = http11
+
+methodFromString :: String -> Method
+methodFromString "OPTIONS" = OPTIONS
+methodFromString "GET"     = GET 
+methodFromString "HEAD"    = HEAD
+methodFromString "POST"    = POST
+methodFromString "PUT"     = PUT 
+methodFromString "DELETE"  = DELETE
+methodFromString "TRACE"   = TRACE
+methodFromString "CONNECT" = CONNECT
+methodFromString xs        = OTHER xs
 
 -- Helpers.
 
