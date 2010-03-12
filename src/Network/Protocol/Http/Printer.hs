@@ -1,21 +1,31 @@
 {-# LANGUAGE FlexibleInstances #-}
-module Network.Protocol.Http.Printer () where {- doc ok -}
+module Network.Protocol.Http.Printer
+( showRequestLine
+, showResponseLine
+)
+where {- doc ok -}
 
 import Network.Protocol.Http.Data
 import Network.Protocol.Http.Status
 
 instance Show (Http Request) where
-  showsPrec _ (Http (Request m u) v hs) =
-      shows m . ss " " . ss u . ss " "
-    . shows v . eol
-    . shows hs . eol . eol
+  showsPrec _ r@(Http Request {} _ hs) =
+    showRequestLine r . shows hs . eol
 
 instance Show (Http Response) where
-  showsPrec _ (Http (Response s) v hs) =
-      shows v . ss " "
-    . shows (codeFromStatus s) -- maybe (ss "Unknown status") shows (lookupR s statusCodes)
-    . ss " " . shows s . eol
-    . shows hs . eol
+  showsPrec _ r@(Http Response {} _ hs) =
+    showResponseLine r . shows hs . eol
+
+showRequestLine :: Http Request -> String -> String
+showRequestLine (Http (Request m u) v _) =
+    shows m . ss " " . ss u . ss " "
+  . shows v . eol
+
+showResponseLine :: Http Response -> String -> String
+showResponseLine (Http (Response s) v _) =
+    shows v . ss " "
+  . shows (codeFromStatus s)
+  . ss " " . shows s . eol
 
 instance Show Headers where
   showsPrec _ =
