@@ -53,6 +53,9 @@ module Network.Protocol.Http
   , server
   , userAgent
   , upgrade
+  , lastModified
+  , acceptRanges
+  , eTag
 
   -- * Parsing HTTP messages.
 

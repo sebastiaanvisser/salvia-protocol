@@ -97,3 +97,18 @@ userAgent = header "User-Agent"
 upgrade :: Http a :-> Maybe String
 upgrade = header "Upgrade"
 
+-- | Access the /Last-Modified/ header field.
+
+lastModified :: Http a :-> Maybe Value
+lastModified = header "Last-Modified"
+
+-- | Access the /Accept-Ranges/ header field.
+
+acceptRanges :: Http a :-> Maybe Value
+acceptRanges = header "Accept-Ranges"
+
+-- | Access the /ETag/ header field.
+
+eTag :: Http a :-> Maybe Value
+eTag = header "ETag"
+
