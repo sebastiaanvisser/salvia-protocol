@@ -22,8 +22,8 @@ defaultMime = "text/plain"
 {- | The mapping from extension to mimetype. -}
 
 extensionToMime :: Map String Mime
-extensionToMime = fromList [
-    ("123",       "application/vnd.lotus-1-2-3")
+extensionToMime = fromList
+  [ ("123",       "application/vnd.lotus-1-2-3")
   , ("3dml",      "text/vnd.in3d.3dml")
   , ("3g2",       "video/3gpp2")
   , ("3gp",       "video/3gpp")
