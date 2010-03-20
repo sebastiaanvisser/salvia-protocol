@@ -7,7 +7,7 @@ module Network.Protocol.Cookie {- todo: test please -}
   Cookie (Cookie)
 , empty
 , cookie
-, cookies
+, setCookie
 
 -- * Accessing cookies.
 , name
@@ -26,8 +26,9 @@ module Network.Protocol.Cookie {- todo: test please -}
 -- * Collection of cookies.
 , Cookies
 , unCookies
-, setCookie
+, cookies
 , setCookies
+
 , pickCookie
 , fromList
 , toList
@@ -183,13 +184,17 @@ parseCookie s =
        , _value = atDef "" p 1
        }
 
--- | Cookie parser and pretty printer as a lens.
+-- | Cookie parser and pretty printer as a lens. To be used in combination with
+-- the /Set-Cookie/ header field.
 
-setCookie :: Cookie :<->: String
-setCookie = show <-> parseSetCookie
+setCookie :: String :<->: Cookie
+setCookie = parseSetCookie <-> show
 
-cookie :: Cookie :<->: String
-cookie = showCookie <-> parseCookie
+-- | Cookie parser and pretty printer as a lens. To be used in combination with
+-- the /Cookie/ header field.
+
+cookie :: String :<->: Cookie
+cookie = parseCookie <-> showCookie
 
 -- | A collection of multiple cookies. These can all be set in one single HTTP
 -- /Set-Cookie/ header field.
@@ -198,6 +203,8 @@ data Cookies = Cookies { _unCookies :: M.Map String Cookie }
   deriving Eq
 
 $(mkLabels [''Cookies])
+
+-- | Access raw cookie mapping from collection.
 
 unCookies :: Cookies :-> M.Map String Cookie
 
@@ -218,6 +225,8 @@ showsSetCookies =
 
 setCookies :: String :<->: Cookies
 setCookies = (fromList <-> toList) . (map parseSetCookie <-> map show) . values ","
+
+-- | Label for printing and parsing collections of cookies.
 
 cookies :: String :<->: Cookies
 cookies = (fromList <-> toList) . (map parseCookie <-> map showCookie) . values ";"
