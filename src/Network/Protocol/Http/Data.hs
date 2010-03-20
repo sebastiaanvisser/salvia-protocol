@@ -123,7 +123,7 @@ method = _method . headline
 uri :: Http Request :-> String
 uri = _uri . headline
 
--- Label to access the URI part of an HTTP request message and access it as a
+-- | Label to access the URI part of an HTTP request message and access it as a
 -- true URI data type.
 
 asUri :: Http Request :-> Uri

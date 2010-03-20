@@ -14,7 +14,7 @@ type Mime = String
 mime :: String -> Maybe Mime
 mime ext = Data.Map.lookup ext extensionToMime
 
-{- | The default mimetype is /text/plain/. -}
+{- | The default mimetype is text/plain. -}
 
 defaultMime :: Mime
 defaultMime = "text/plain"
