@@ -3,13 +3,13 @@
   , TypeOperators
   , FlexibleContexts
   , FlexibleInstances
+  , CPP
   #-}
 module Network.Protocol.Uri.Parser where
 
 import Control.Applicative hiding (empty)
 import Control.Category
 import Data.Char
-import Control.Monad
 import Control.Applicative
 import Data.List 
 import Data.Maybe
@@ -22,6 +22,8 @@ import Prelude hiding ((.), id, mod)
 import Safe
 import Text.ParserCombinators.Parsec hiding (many, (<|>))
 
+#if PARSEC2
+import Control.Monad
 instance Applicative (GenParser Char st) where
   pure = return
   (<*>) = ap
@@ -29,6 +31,7 @@ instance Applicative (GenParser Char st) where
 instance Alternative (GenParser Char st) where
   empty = mzero
   (<|>) = mplus
+#endif
 
 -- | Access the host part of the URI.
 

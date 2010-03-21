@@ -18,9 +18,17 @@ Author:             Sebastiaan Visser
 Maintainer:         sfvisser@cs.uu.nl
 Build-Type:         Simple
 
+Flag parsec2
+  Description:      Are we using parsec2?
+
 Library
   GHC-Options:      -Wall -fno-warn-orphans
   HS-Source-Dirs:   src
+  If flag(parsec2)
+    Build-Depends:  parsec == 2.1.*
+    CPP-Options:    -DPARSEC2
+  Else
+    Build-Depends:  parsec == 3.0.*
 
   Build-Depends:    base ==4.*,
                     containers >= 0.2 && < 0.4,
@@ -29,7 +37,6 @@ Library
                     split ==0.1.*,
                     bimap ==0.2.*,
                     bytestring ==0.9.*,
-                    parsec ==2.1.*,
                     utf8-string ==0.3.*
 
   Exposed-modules:  Network.Protocol.Cookie
