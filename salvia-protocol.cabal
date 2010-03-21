@@ -1,7 +1,15 @@
 Name:               salvia-protocol
-Version:            1.0.0
-Description:        Protocol suite for the Salvia webserver, including functionality for URI, HTTP, Cookie and MIME.
-Synopsis:           Protocol suite for the Salvia webserver, including functionality for URI, HTTP, Cookie and MIME.
+Version:            1.0.1
+Synopsis:           Salvia webserver protocol suite supporting URI, HTTP, Cookie and MIME.
+Description:
+  Protocol suite for the Salvia webserver, including functionality for URI,
+  HTTP, Cookie and MIME.
+
+  This pacakage exposes the datatypes, parsers, pretty printers and some
+  utility functions to deal with several web protocols. The /fclabels/ package
+  is used to generate labels pointing into the exposed datatypes, allowing to
+  easily get, set and modify parts of the structures.
+
 Cabal-version:      >= 1.6
 Category:           Network, Web, Protocol
 License:            BSD3
