@@ -7,10 +7,9 @@
   #-}
 module Network.Protocol.Uri.Parser where
 
-import Control.Applicative hiding (empty)
+import Control.Applicative
 import Control.Category
 import Data.Char
-import Control.Applicative
 import Data.List 
 import Data.Maybe
 import Data.Record.Label
