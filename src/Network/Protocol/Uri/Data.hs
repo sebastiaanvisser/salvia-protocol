@@ -49,17 +49,17 @@ data Uri = Uri
   }
   deriving (Eq, Ord)
 
-$(mkLabels [''Domain, ''Path, ''Host, ''Authority, ''Uri])
+$(mkLabelsNoTypes [''Domain, ''Path, ''Host, ''Authority, ''Uri])
 
-_parts    :: Domain :-> [String]
-_domain   :: Host :-> Domain
-_ipv4     :: Host :-> IPv4
-_regname  :: Host :-> String
+_parts    :: Domain    :-> [String]
+_domain   :: Host      :-> Domain
+_ipv4     :: Host      :-> IPv4
+_regname  :: Host      :-> String
 _host     :: Authority :-> Host
 _port     :: Authority :-> Maybe Port
 _userinfo :: Authority :-> UserInfo
-_segments :: Path :-> [PathSegment]
-_path     :: Uri :-> Path
+_segments :: Path      :-> [PathSegment]
+_path     :: Uri       :-> Path
 
 -- | Access raw (URI-encoded) query.
 
@@ -73,7 +73,7 @@ authority :: Uri :-> Authority
 -- regname or IP-address.
 
 domain :: Uri :-> Maybe Domain
-domain = (f <-> Hostname . fromJust) `iso` (_host . authority)
+domain = (f :<->: Hostname . fromJust) % _host . authority
   where
     f (Hostname d) = Just d
     f _            = Nothing
@@ -82,7 +82,7 @@ domain = (f <-> Hostname . fromJust) `iso` (_host . authority)
 -- domain or IP-address.
 
 regname :: Uri :-> Maybe RegName
-regname = (f <-> RegName . fromJust) `iso` (_host . authority)
+regname = (f :<->: RegName . fromJust) % _host . authority
   where
     f (RegName r) = Just r
     f _           = Nothing
@@ -91,7 +91,7 @@ regname = (f <-> RegName . fromJust) `iso` (_host . authority)
 -- domain or regname.
 
 ipv4 :: Uri :-> Maybe IPv4
-ipv4 = (f <-> IP . fromJust) `iso` (_host . authority)
+ipv4 = (f :<->: IP . fromJust) % _host . authority
   where
     f (IP i) = Just i
     f _      = Nothing
@@ -109,13 +109,13 @@ port = _port . authority
 -- will be properly decoded when reading and encoded when writing.
 
 query :: Uri :-> Query
-query = encoded `iso` _query
+query = encoded % _query
 
 -- | Access the fragment part of the URI, the part that follows the #. The
 -- fragment will be properly decoded when reading and encoded when writing.
 
 fragment :: Uri :-> Fragment
-fragment = encoded `iso` _fragment
+fragment = encoded % _fragment
 
 -- | Is a URI relative?
 

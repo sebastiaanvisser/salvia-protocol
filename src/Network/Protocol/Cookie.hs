@@ -65,7 +65,7 @@ data Cookie =
     , _version    :: Int
     } deriving Eq
 
-$(mkLabels [''Cookie])
+$(mkLabelsNoTypes [''Cookie])
 
 -- | Access name/key of a cookie.
 
@@ -130,17 +130,17 @@ instance Show Cookie where
 
 showsSetCookie :: Cookie -> ShowS
 showsSetCookie c =
-    pair (get name c) (get value c)
-  . opt  "comment"    (get comment c)
-  . opt  "commentURL" (get commentURL c)
-  . bool "discard"    (get discard c)
-  . opt  "domain"     (get domain c)
-  . opt  "maxAge"     (fmap show $ get maxAge c)
-  . opt  "expires"    (get expires c)
-  . opt  "path"       (get path c)
-  . lst  "port"       (map show $ get port c)
-  . bool "secure"     (get secure c)
-  . opt  "version"    (optval $ get version c)
+    pair (getL name c) (getL value c)
+  . opt  "comment"    (getL comment c)
+  . opt  "commentURL" (getL commentURL c)
+  . bool "discard"    (getL discard c)
+  . opt  "domain"     (getL domain c)
+  . opt  "maxAge"     (fmap show (getL maxAge c))
+  . opt  "expires"    (getL expires c)
+  . opt  "path"       (getL path c)
+  . lst  "port"       (map show (getL port c))
+  . bool "secure"     (getL secure c)
+  . opt  "version"    (optval (getL version c))
   where
     attr a       = showString a
     val v        = showString ("=" ++ v)
@@ -149,7 +149,7 @@ showsSetCookie c =
     pair a v     = attr a . val v . end
     opt a        = maybe id (pair a)
     lst _ []     = id
-    lst a xs     = pair a $ intercalate "," xs
+    lst a xs     = pair a (intercalate "," xs)
     bool _ False = id
     bool a True  = single a
     optval 0     = Nothing
@@ -188,13 +188,13 @@ parseCookie s =
 -- the /Set-Cookie/ header field.
 
 setCookie :: String :<->: Cookie
-setCookie = parseSetCookie <-> show
+setCookie = parseSetCookie :<->: show
 
 -- | Cookie parser and pretty printer as a lens. To be used in combination with
 -- the /Cookie/ header field.
 
 cookie :: String :<->: Cookie
-cookie = parseCookie <-> showCookie
+cookie = parseCookie :<->: showCookie
 
 -- | A collection of multiple cookies. These can all be set in one single HTTP
 -- /Set-Cookie/ header field.
@@ -202,7 +202,7 @@ cookie = parseCookie <-> showCookie
 data Cookies = Cookies { _unCookies :: M.Map String Cookie }
   deriving Eq
 
-$(mkLabels [''Cookies])
+$(mkLabelsNoTypes [''Cookies])
 
 -- | Access raw cookie mapping from collection.
 
@@ -216,7 +216,7 @@ showsSetCookies =
       is (showString ", ")
     . map (shows . snd)
     . M.toList
-    . get unCookies
+    . getL unCookies
   where
   is _ []     = id
   is s (x:xs) = foldl (\a b -> a.s.b) x xs
@@ -224,26 +224,26 @@ showsSetCookies =
 -- | Cookies parser and pretty printer as a lens.
 
 setCookies :: String :<->: Cookies
-setCookies = (fromList <-> toList) . (map parseSetCookie <-> map show) . values ","
+setCookies = (fromList :<->: toList) . (map parseSetCookie :<->: map show) . values ","
 
 -- | Label for printing and parsing collections of cookies.
 
 cookies :: String :<->: Cookies
-cookies = (fromList <-> toList) . (map parseCookie <-> map showCookie) . values ";"
+cookies = (fromList :<->: toList) . (map parseCookie :<->: map showCookie) . values ";"
 
 -- | Case-insensitive way of getting a cookie out of a collection by name.
 
 pickCookie :: String -> Cookies :-> Maybe Cookie
 pickCookie n = lookupL (map toLower n) . unCookies
-  where lookupL k = label (M.lookup k) (flip M.alter k . const)
+  where lookupL k = lens (M.lookup k) (flip M.alter k . const)
 
 -- | Convert a list to a cookies collection.
 
 fromList :: [Cookie] -> Cookies
-fromList = Cookies . M.fromList . map (\a -> (map toLower $ get name a, a))
+fromList = Cookies . M.fromList . map (\a -> (map toLower (getL name a), a))
 
 -- | Get the cookies as a list.
 
 toList :: Cookies -> [Cookie]
-toList = map snd . M.toList . get unCookies
+toList = map snd . M.toList . getL unCookies
 

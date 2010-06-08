@@ -12,7 +12,7 @@ import Safe
 -- | Access the /Content-Length/ header field.
 
 contentLength :: (Read i, Integral i) => Http a :-> Maybe i
-contentLength = (join . fmap readMay <-> fmap show) `iso` header "Content-Length"
+contentLength = (join . fmap readMay :<->: fmap show) % header "Content-Length"
 
 -- | Access the /Connection/ header field.
 
@@ -22,17 +22,17 @@ connection = header "Connection"
 -- | Access the /Accept/ header field.
 
 accept :: Http a :-> Maybe Parameters
-accept = lmap (keyValues "," ";") `iso` header "Accept"
+accept = lmap (keyValues "," ";") % header "Accept"
 
 -- | Access the /Accept-Encoding/ header field.
 
 acceptEncoding :: Http a :-> Maybe [String]
-acceptEncoding = lmap (values ",") `iso` header "Accept-Encoding"
+acceptEncoding = lmap (values ",") % header "Accept-Encoding"
 
 -- | Access the /Accept-Language/ header field.
 
 acceptLanguage :: Http a :-> Maybe [String]
-acceptLanguage = lmap (values ",") `iso` header "Accept-Language"
+acceptLanguage = lmap (values ",") % header "Accept-Language"
 
 -- | Access the /Connection/ header field.
 
@@ -42,7 +42,7 @@ cacheControl = header "Cache-Control"
 -- | Access the /Keep-Alive/ header field.
 
 keepAlive :: (Read i, Integral i) => Http a :-> Maybe i
-keepAlive = (join . fmap readMay <-> fmap show) `iso` header "Keep-Alive"
+keepAlive = (join . fmap readMay :<->: fmap show) % header "Keep-Alive"
 
 -- | Access the /Cookie/ header field.
 
@@ -64,9 +64,9 @@ location = header "Location"
 
 contentType :: Http a :-> Maybe (String, Maybe String)
 contentType = 
-        (parser <-> fmap printer)
-  `iso` lmap (keyValues ";" "=")
-  `iso` header "Content-Type"
+    (parser :<->: fmap printer)
+  % lmap (keyValues ";" "=")
+  % header "Content-Type"
   where 
     printer (x, y) = (x, Nothing) : maybe [] (\z -> [("charset", Just z)]) y
     parser (Just ((m, Nothing):("charset", c):_)) = Just (m, c)

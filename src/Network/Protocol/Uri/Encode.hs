@@ -33,5 +33,5 @@ decode = U.toString . B.pack . map (fromIntegral . ord) . dec
 -- | Decoding and encoding as a label.
 
 encoded :: String :<->: String
-encoded = decode <-> encode
+encoded = decode :<->: encode
 

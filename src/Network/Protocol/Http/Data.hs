@@ -8,7 +8,7 @@ import Data.List.Split
 import Data.Record.Label
 import Network.Protocol.Http.Status
 import Network.Protocol.Uri
-import Prelude hiding ((.), id, lookup, mod)
+import Prelude hiding ((.), id, lookup)
 
 -- | List of HTTP request methods.
 
@@ -85,7 +85,7 @@ emptyRequest = Http (Request GET "") http11 emptyHeaders
 emptyResponse :: Http Response
 emptyResponse = Http (Response OK) http11 emptyHeaders
 
-$(mkLabels [''Version, ''Request, ''Response, ''Http])
+$(mkLabelsNoTypes [''Version, ''Request, ''Response, ''Http])
 
 -- | Label to access the major part of the version.
 
@@ -97,8 +97,8 @@ minor :: Version :-> Int
 
 -- Internal helper labels.
 
-_uri    :: Request :-> String
-_method :: Request :-> Method
+_uri    :: Request  :-> String
+_method :: Request  :-> Method
 _status :: Response :-> Status
 
 -- | Label to access the header of an HTTP message.
@@ -127,7 +127,7 @@ uri = _uri . headline
 -- true URI data type.
 
 asUri :: Http Request :-> Uri
-asUri = (toUri <-> show) `iso` uri
+asUri = (toUri :<->: show) % uri
 
 -- | Label to access the status part of an HTTP response message.
 
@@ -142,12 +142,12 @@ normalizeHeader = intercalate "-" . map casing . splitOn "-"
   casing ""     = ""
   casing (x:xs) = toUpper x : map toLower xs
 
--- | Generic label to access an HTTP header field by key.
+-- | Generic lens to access an HTTP header field by key.
 
 header :: Key -> Http a :-> Maybe Value
-header key = label
-  (lookup (normalizeHeader key) . unHeaders . get headers)
-  (\x -> mod headers (Headers . alter (normalizeHeader key) x . unHeaders))
+header key = lens
+  (lookup (normalizeHeader key) . unHeaders . getL headers)
+  (\x -> modL headers (Headers . alter (normalizeHeader key) x . unHeaders))
   where
   alter :: Eq a => a -> Maybe b -> [(a, b)] -> [(a, b)]
   alter k v []                      = maybe [] (\w -> (k, w):[]) v

@@ -1,5 +1,5 @@
 Name:               salvia-protocol
-Version:            1.0.1
+Version:            1.1.0
 Synopsis:           Salvia webserver protocol suite supporting URI, HTTP, Cookie and MIME.
 Description:
   Protocol suite for the Salvia webserver, including functionality for URI,
@@ -15,7 +15,7 @@ Category:           Network, Web, Protocol
 License:            BSD3
 License-file:       LICENSE
 Author:             Sebastiaan Visser
-Maintainer:         sfvisser@cs.uu.nl
+Maintainer:         haskell@fvisser.nl
 Build-Type:         Simple
 
 Flag parsec2
@@ -33,7 +33,7 @@ Library
   Build-Depends:    base ==4.*,
                     containers >= 0.2 && < 0.4,
                     safe ==0.2.*,
-                    fclabels >=0.4.2 && < 0.5,
+                    fclabels ==1.0.*,
                     split ==0.1.*,
                     bimap ==0.2.*,
                     bytestring ==0.9.*,
