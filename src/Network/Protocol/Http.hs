@@ -55,6 +55,8 @@ module Network.Protocol.Http
   , upgrade
   , lastModified
   , acceptRanges
+  , referer
+  , origin
   , eTag
 
   -- * Parsing HTTP messages.

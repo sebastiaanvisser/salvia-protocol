@@ -107,6 +107,16 @@ lastModified = header "Last-Modified"
 acceptRanges :: Http a :-> Maybe Value
 acceptRanges = header "Accept-Ranges"
 
+-- | Access the /Referer/ header field.
+
+referer :: Http a :-> Maybe Value
+referer = header "Referer"
+
+-- | Access the /Origin/ header field.
+
+origin :: Http a :-> Maybe Value
+origin = header "Origin"
+
 -- | Access the /ETag/ header field.
 
 eTag :: Http a :-> Maybe Value
