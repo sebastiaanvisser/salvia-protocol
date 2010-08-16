@@ -33,7 +33,7 @@ Library
   Build-Depends:    base ==4.*,
                     containers >= 0.2 && < 0.4,
                     safe ==0.2.*,
-                    fclabels ==1.0.*,
+                    fclabels ==0.9.*,
                     split ==0.1.*,
                     bimap ==0.2.*,
                     bytestring ==0.9.*,
