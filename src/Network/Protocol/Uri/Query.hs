@@ -19,9 +19,11 @@ queryParams = params % _query
 -- | Generic lens to parse/print a string as query parameters.
 
 params :: String :<->: Parameters
-params = keyValues "&" "=" . (from :<->: to) . encoded
+params = (enc :<->: dec) . keyValues "&" "=" . (from :<->: to)
   where from = intercalate " " . splitOn "+"
         to   = intercalate "+" . splitOn " "
+        enc = map (\(a, b) -> (decode a, fmap decode b))
+        dec = map (\(a, b) -> (encode a, fmap encode b))
 
 -- | Generic label for accessing key value pairs encoded in a string.
 
