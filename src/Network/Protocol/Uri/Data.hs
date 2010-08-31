@@ -127,10 +127,10 @@ relative :: Uri :-> Bool
 scheme :: Uri :-> Scheme
 
 -- | Access the path part of the URI as a list of path segments. The segments
--- will still be URI-encoded.
+-- will be properly URI-decoded.
 
 segments :: Uri :-> [PathSegment]
-segments = _segments . _path
+segments = (map encode :<->: map decode) % _segments . _path
 
 -- | Access the userinfo part of the URI. The userinfo contains an optional
 -- username and password or some other credentials.
