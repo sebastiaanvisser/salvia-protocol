@@ -52,6 +52,8 @@ module Network.Protocol.Uri (
   , encode
   , decode
   , encoded
+  , encodeString
+  , decodeString
 
   -- * Creating empty URIs.
 
