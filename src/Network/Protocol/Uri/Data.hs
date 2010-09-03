@@ -130,7 +130,7 @@ scheme :: Uri :-> Scheme
 -- will be properly URI-decoded.
 
 segments :: Uri :-> [PathSegment]
-segments = (map encode :<->: map decode) % _segments . _path
+segments = (map decode :<->: map encode) % _segments . _path
 
 -- | Access the userinfo part of the URI. The userinfo contains an optional
 -- username and password or some other credentials.
