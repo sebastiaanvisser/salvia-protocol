@@ -1,5 +1,5 @@
 Name:               salvia-protocol
-Version:            1.1.1
+Version:            1.1.2
 Synopsis:           Salvia webserver protocol suite supporting URI, HTTP, Cookie and MIME.
 Description:
   Protocol suite for the Salvia webserver, including functionality for URI,
@@ -20,6 +20,7 @@ Build-Type:         Simple
 
 Flag parsec2
   Description:      Are we using parsec2?
+  Default:          False
 
 Library
   GHC-Options:      -Wall -fno-warn-orphans
@@ -28,16 +29,16 @@ Library
     Build-Depends:  parsec == 2.1.*
     CPP-Options:    -DPARSEC2
   Else
-    Build-Depends:  parsec == 3.0.*
+    Build-Depends:  parsec >= 3 && < 3.2
 
-  Build-Depends:    base ==4.*
-                  , containers >= 0.2 && < 0.4
-                  , safe ==0.2.*
-                  , fclabels >= 0.9 && < 0.12
-                  , split ==0.1.*
-                  , bimap ==0.2.*
-                  , utf8-string ==0.3.*
-                  , bytestring ==0.9.*
+  Build-Depends:    base        >= 4   && < 5
+                  , containers  >= 0.2 && < 0.5
+                  , safe        >= 0.2 && < 0.4
+                  , fclabels    >= 0.9 && < 1.2
+                  , split       == 0.1.*
+                  , bimap       == 0.2.*
+                  , utf8-string == 0.3.*
+                  , bytestring  == 0.9.*
 
   Exposed-modules:  Network.Protocol.Cookie
                     Network.Protocol.Http
