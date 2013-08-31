@@ -19,6 +19,8 @@ contentLength = Bij (join . fmap readMay)  (fmap show) `iso` header "Content-Len
 connection :: Http a :-> Maybe String
 connection = header "Connection"
 
+lmap l = let (Bij a b) = l in Bij (fmap a) (fmap b)
+
 -- | Access the /Accept/ header field.
 
 accept :: Http a :-> Maybe Parameters

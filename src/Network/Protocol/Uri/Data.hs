@@ -49,25 +49,8 @@ data Uri = Uri
   }
   deriving (Eq, Ord)
 
-$(mkLabelsNoTypes [''Domain, ''Path, ''Host, ''Authority, ''Uri])
+$(mkLabels [''Domain, ''Path, ''Host, ''Authority, ''Uri])
 
-_parts    :: Domain    :-> [String]
-_domain   :: Host      :-> Domain
-_ipv4     :: Host      :-> IPv4
-_regname  :: Host      :-> String
-_host     :: Authority :-> Host
-_port     :: Authority :-> Maybe Port
-_userinfo :: Authority :-> UserInfo
-_segments :: Path      :-> [PathSegment]
-_path     :: Uri       :-> Path
-
--- | Access raw (URI-encoded) query.
-
-_query :: Uri :-> Query
-
--- | Access authority part of the URI.
-
-authority :: Uri :-> Authority
 
 -- | Access domain part of the URI, returns `Nothing' when the host is a
 -- regname or IP-address.
@@ -96,10 +79,6 @@ ipv4 = Bij f (IP . fromJust) `iso` _host . authority
     f (IP i) = Just i
     f _      = Nothing
 
--- | Access raw (URI-encoded) fragment.
-
-_fragment :: Uri :-> Fragment
-
 -- | Access the port number part of the URI when available.
 
 port :: Uri :-> Maybe Port
@@ -115,16 +94,8 @@ query = encoded `iso` _query
 -- fragment will be properly decoded when reading and encoded when writing.
 
 fragment :: Uri :-> Fragment
-
--- | Is a URI relative?
-
-relative :: Uri :-> Bool
-
--- | Access the scheme part of the URI. A scheme is probably the protocol
--- indicator like /http/, /ftp/, etc.
 fragment = encoded `iso` _fragment
 
-scheme :: Uri :-> Scheme
 
 -- | Access the path part of the URI as a list of path segments. The segments
 -- will be properly URI-decoded.
