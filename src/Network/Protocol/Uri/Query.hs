@@ -5,7 +5,7 @@ import Prelude hiding ((.), id)
 import Control.Category
 import Data.List
 import Data.List.Split 
-import Data.Record.Label
+import Data.Label
 import Network.Protocol.Uri.Data
 import Network.Protocol.Uri.Encode
 
@@ -14,12 +14,12 @@ type Parameters = [(String, Maybe String)]
 -- | Fetch the query parameters form a URI.
 
 queryParams :: Uri :-> Parameters
-queryParams = params % _query
+queryParams = params `iso` _query
 
 -- | Generic lens to parse/print a string as query parameters.
 
-params :: String :<->: Parameters
-params = (enc :<->: dec) . keyValues "&" "=" . (from :<->: to)
+params :: Bijection (->) String [(String, Maybe String)]
+params = Bij enc dec . keyValues "&" "=" . (Bij from to)
   where from = intercalate " " . splitOn "+"
         to   = intercalate "+" . splitOn " "
         enc = map (\(a, b) -> (decode a, fmap decode b))
@@ -27,8 +27,8 @@ params = (enc :<->: dec) . keyValues "&" "=" . (from :<->: to)
 
 -- | Generic label for accessing key value pairs encoded in a string.
 
-keyValues :: String -> String -> String :<->: Parameters
-keyValues sep eqs = parser :<->: printer
+keyValues :: String -> String -> Bijection (->) String [(String, Maybe String)]
+keyValues sep eqs = Bij parser printer
   where parser =
             filter (\(a, b) -> not (null a) || b /= Nothing && b /= Just "")
           . map (f . splitOn eqs)
@@ -42,8 +42,8 @@ keyValues sep eqs = parser :<->: printer
 
 -- | Generic label for accessing lists of values encoded in a string.
 
-values :: String -> String :<->: [String]
-values sep = parser :<->: printer
+values :: String -> Bijection (->) String [String]
+values sep = Bij parser printer
   where parser = filter (not . null) . concat . map (map trim . splitOn sep) . lines
         printer = intercalate sep
 

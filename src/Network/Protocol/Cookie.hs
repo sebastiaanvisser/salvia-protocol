@@ -38,7 +38,7 @@ where
 import Prelude hiding ((.), id)
 import Control.Category
 import Control.Monad (join)
-import Data.Record.Label
+import Data.Label
 import Data.Maybe
 import Data.Char
 import Safe
@@ -130,17 +130,17 @@ instance Show Cookie where
 
 showsSetCookie :: Cookie -> ShowS
 showsSetCookie c =
-    pair (getL name c) (getL value c)
-  . opt  "comment"    (getL comment c)
-  . opt  "commentURL" (getL commentURL c)
-  . bool "discard"    (getL discard c)
-  . opt  "domain"     (getL domain c)
-  . opt  "maxAge"     (fmap show (getL maxAge c))
-  . opt  "expires"    (getL expires c)
-  . opt  "path"       (getL path c)
-  . lst  "port"       (map show (getL port c))
-  . bool "secure"     (getL secure c)
-  . opt  "version"    (optval (getL version c))
+    pair (get name c) (get value c)
+  . opt  "comment"    (get comment c)
+  . opt  "commentURL" (get commentURL c)
+  . bool "discard"    (get discard c)
+  . opt  "domain"     (get domain c)
+  . opt  "maxAge"     (fmap show (get maxAge c))
+  . opt  "expires"    (get expires c)
+  . opt  "path"       (get path c)
+  . lst  "port"       (map show (get port c))
+  . bool "secure"     (get secure c)
+  . opt  "version"    (optval (get version c))
   where
     attr a       = showString a
     val v        = showString ("=" ++ v)
@@ -187,14 +187,14 @@ parseCookie s =
 -- | Cookie parser and pretty printer as a lens. To be used in combination with
 -- the /Set-Cookie/ header field.
 
-setCookie :: String :<->: Cookie
-setCookie = parseSetCookie :<->: show
+setCookie :: Bijection (->) String Cookie
+setCookie = Bij parseSetCookie show
 
 -- | Cookie parser and pretty printer as a lens. To be used in combination with
 -- the /Cookie/ header field.
 
-cookie :: String :<->: Cookie
-cookie = parseCookie :<->: showCookie
+cookie :: Bijection (->) String Cookie
+cookie = Bij parseCookie showCookie
 
 -- | A collection of multiple cookies. These can all be set in one single HTTP
 -- /Set-Cookie/ header field.
@@ -216,20 +216,20 @@ showsSetCookies =
       is (showString ", ")
     . map (shows . snd)
     . M.toList
-    . getL unCookies
+    . get unCookies
   where
   is _ []     = id
   is s (x:xs) = foldl (\a b -> a.s.b) x xs
 
 -- | Cookies parser and pretty printer as a lens.
 
-setCookies :: String :<->: Cookies
-setCookies = (fromList :<->: toList) . (map parseSetCookie :<->: map show) . values ","
+setCookies :: Bijection (->) String Cookies
+setCookies = (Bij fromList toList) . (Bij (map parseSetCookie) (map show)) . values ","
 
 -- | Label for printing and parsing collections of cookies.
 
-cookies :: String :<->: Cookies
-cookies = (fromList :<->: toList) . (map parseCookie :<->: map showCookie) . values ";"
+cookies :: Bijection (->) String Cookies
+cookies = (Bij fromList toList) . (Bij (map parseCookie) (map showCookie)) . values ";"
 
 -- | Case-insensitive way of getting a cookie out of a collection by name.
 
@@ -240,10 +240,10 @@ pickCookie n = lookupL (map toLower n) . unCookies
 -- | Convert a list to a cookies collection.
 
 fromList :: [Cookie] -> Cookies
-fromList = Cookies . M.fromList . map (\a -> (map toLower (getL name a), a))
+fromList = Cookies . M.fromList . map (\a -> (map toLower (get name a), a))
 
 -- | Get the cookies as a list.
 
 toList :: Cookies -> [Cookie]
-toList = map snd . M.toList . getL unCookies
+toList = map snd . M.toList . get unCookies
 

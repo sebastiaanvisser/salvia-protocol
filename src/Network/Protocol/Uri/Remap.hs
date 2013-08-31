@@ -2,7 +2,7 @@ module Network.Protocol.Uri.Remap where
 
 import Control.Category
 import Data.List 
-import Data.Record.Label
+import Data.Label
 import Network.Protocol.Uri.Data
 import Prelude hiding ((.), id)
 
@@ -15,16 +15,16 @@ remap (f, t) u =
   let
     ftu = [f, t, u]
     hst = _host . authority
-    [h0, h1, h2] = map (getL hst)      ftu
-    [p0, p1, p2] = map (getL port)     ftu
-    [s0, s1, s2] = map (getL segments) ftu
+    [h0, h1, h2] = map (get hst)      ftu
+    [p0, p1, p2] = map (get port)     ftu
+    [s0, s1, s2] = map (get segments) ftu
   in case
      ( remapHost h0 h1 h2
      , remapPort p0 p1 p2
      , remapPath s0 s1 s2
      ) of
     (Just h, Just p, Just s)
-      -> Just (setL hst h . setL port p . setL segments s $ u)
+      -> Just (set hst h . set port p . set segments s $ u)
     _ -> Nothing
   where
   remapHost (Hostname (Domain a))

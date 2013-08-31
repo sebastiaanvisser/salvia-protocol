@@ -5,7 +5,7 @@ import Control.Category
 import Data.Char
 import Data.List
 import Data.List.Split
-import Data.Record.Label
+import Data.Label
 import Network.Protocol.Http.Status
 import Network.Protocol.Uri
 import Prelude hiding ((.), id, lookup)
@@ -127,7 +127,7 @@ uri = _uri . headline
 -- true URI data type.
 
 asUri :: Http Request :-> Uri
-asUri = (toUri :<->: show) % uri
+asUri = Bij toUri show `iso` uri
 
 -- | Label to access the status part of an HTTP response message.
 
@@ -146,8 +146,8 @@ normalizeHeader = intercalate "-" . map casing . splitOn "-"
 
 header :: Key -> Http a :-> Maybe Value
 header key = lens
-  (lookup (normalizeHeader key) . unHeaders . getL headers)
-  (\x -> modL headers (Headers . alter (normalizeHeader key) x . unHeaders))
+  (lookup (normalizeHeader key) . unHeaders . get headers)
+  (\x -> modify headers (Headers . alter (normalizeHeader key) x . unHeaders))
   where
   alter :: Eq a => a -> Maybe b -> [(a, b)] -> [(a, b)]
   alter k v []                      = maybe [] (\w -> (k, w):[]) v

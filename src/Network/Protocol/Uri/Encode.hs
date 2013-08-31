@@ -4,7 +4,7 @@ module Network.Protocol.Uri.Encode where
 import Data.Bits
 import Data.Char
 import Data.Maybe
-import Data.Record.Label
+import Data.Label
 import Network.Protocol.Uri.Chars
 import qualified Data.ByteString as B
 import qualified Data.ByteString.Char8 as C
@@ -12,8 +12,8 @@ import qualified Data.ByteString.UTF8 as U
 
 -- | Decoding and encoding as a label.
 
-encoded :: String :<->: String
-encoded = decode :<->: encode
+encoded :: Bijection (->) String String
+encoded = Bij decode encode
 
 -- | URI encode an UTF8 String.
 

@@ -12,7 +12,7 @@ import Control.Category
 import Data.Char
 import Data.List 
 import Data.Maybe
-import Data.Record.Label
+import Data.Label
 import Network.Protocol.Uri.Data
 import Network.Protocol.Uri.Encode
 import Network.Protocol.Uri.Printer ()
@@ -35,21 +35,21 @@ instance Alternative (GenParser Char st) where
 -- | Access the host part of the URI.
 
 host :: Uri :-> String
-host = (show :<->: either (const mkHost) id . parseHost) % _host . authority
+host = Bij show (either (const mkHost) id . parseHost) `iso` _host . authority
 
 -- | Access the path part of the URI. The query will be properly decoded when
 -- reading and encoded when writing.
 
 path :: Uri :-> FilePath
-path = (decode . show :<->: either (const mkPath) id . parsePath . encode) % _path
+path = Bij (decode . show)  (either (const mkPath) id . parsePath . encode) `iso` _path
 
 -- | Access the path and query parts of the URI as a single string. The string
 -- will will be properly decoded when reading and encoded when writing.
 
 pathAndQuery :: Uri :-> String
-pathAndQuery = flp (values "?") % Lens ((\p q -> [p, q]) <$> idx 0 `for` path <*> idx 1 `for` query)
+pathAndQuery = flp (values "?") `iso` Lens ((\p q -> [p, q]) <$> idx 0 `for` path <*> idx 1 `for` query)
   where idx = flip (atDef "")
-        flp (a :<->: b) = b :<->: a
+        flp (Bij a b) = Bij b a
 
 -- | Parse string into a URI and ignore all failures by returning an empty URI
 -- when parsing fails. Can be quite useful in situations that parse errors are

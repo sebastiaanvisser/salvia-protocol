@@ -3,7 +3,7 @@ module Network.Protocol.Uri.Data where
 
 import Prelude hiding ((.), id)
 import Control.Category
-import Data.Record.Label
+import Data.Label
 import Data.Maybe
 import Network.Protocol.Uri.Encode
 
@@ -73,7 +73,7 @@ authority :: Uri :-> Authority
 -- regname or IP-address.
 
 domain :: Uri :-> Maybe Domain
-domain = (f :<->: Hostname . fromJust) % _host . authority
+domain = Bij f (Hostname . fromJust) `iso` _host . authority
   where
     f (Hostname d) = Just d
     f _            = Nothing
@@ -82,7 +82,7 @@ domain = (f :<->: Hostname . fromJust) % _host . authority
 -- domain or IP-address.
 
 regname :: Uri :-> Maybe RegName
-regname = (f :<->: RegName . fromJust) % _host . authority
+regname = Bij f (RegName . fromJust) `iso` _host . authority
   where
     f (RegName r) = Just r
     f _           = Nothing
@@ -91,7 +91,7 @@ regname = (f :<->: RegName . fromJust) % _host . authority
 -- domain or regname.
 
 ipv4 :: Uri :-> Maybe IPv4
-ipv4 = (f :<->: IP . fromJust) % _host . authority
+ipv4 = Bij f (IP . fromJust) `iso` _host . authority
   where
     f (IP i) = Just i
     f _      = Nothing
@@ -109,13 +109,12 @@ port = _port . authority
 -- will be properly decoded when reading and encoded when writing.
 
 query :: Uri :-> Query
-query = encoded % _query
+query = encoded `iso` _query
 
 -- | Access the fragment part of the URI, the part that follows the #. The
 -- fragment will be properly decoded when reading and encoded when writing.
 
 fragment :: Uri :-> Fragment
-fragment = encoded % _fragment
 
 -- | Is a URI relative?
 
@@ -123,6 +122,7 @@ relative :: Uri :-> Bool
 
 -- | Access the scheme part of the URI. A scheme is probably the protocol
 -- indicator like /http/, /ftp/, etc.
+fragment = encoded `iso` _fragment
 
 scheme :: Uri :-> Scheme
 
@@ -130,7 +130,7 @@ scheme :: Uri :-> Scheme
 -- will be properly URI-decoded.
 
 segments :: Uri :-> [PathSegment]
-segments = (map decode :<->: map encode) % _segments . _path
+segments = Bij (map decode) (map encode) `iso` _segments . _path
 
 -- | Access the userinfo part of the URI. The userinfo contains an optional
 -- username and password or some other credentials.

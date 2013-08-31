@@ -3,7 +3,7 @@ module Network.Protocol.Uri.Path where
 
 import Data.List
 import Network.Protocol.Mime
-import Data.Record.Label
+import Data.Label
 
 {- | Label to access the extension of a filename. -}
 
@@ -23,7 +23,7 @@ extension.
 -}
 
 mimetype :: FilePath -> Maybe String
-mimetype p = getL extension p >>= mime
+mimetype p = get extension p >>= mime
 
 {- |
 Normalize a path by removing or merging all dot or dot-dot segments and double
